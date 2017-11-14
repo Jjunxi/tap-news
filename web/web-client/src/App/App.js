@@ -5,7 +5,7 @@ import React, { Component } from 'react';
 import './App.css';
 import logo from './logo.png'
 
-import NewsPanel from '../NewsPanel/NewPanel';
+import NewsPanel from '../NewsPanel/NewsPanel';
 
 
 class App extends Component {

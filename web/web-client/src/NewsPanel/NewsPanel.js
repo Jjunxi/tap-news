@@ -1,6 +1,8 @@
 import React from 'react';
 import './NewsPanel.css';
 
+import NewsCard from '../NewsCard/NewsCard';
+
 class NewsPanel extends React.Component {
     constructor() {
         super();
@@ -55,3 +57,5 @@ class NewsPanel extends React.Component {
 
     }
 }
+
+export default NewsPanel;

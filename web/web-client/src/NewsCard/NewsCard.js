@@ -3,7 +3,7 @@ import './NewsCard.css';
 
 class NewsCard extends React.Component {
     // no state then no need constructor and componentDidMount
-    
+
     redirectToUrl(url) {
         window.open(url, '_blank');
     }
@@ -34,5 +34,6 @@ class NewsCard extends React.Component {
             </div>
         );
     }
-
 }
+
+export default NewsCard;

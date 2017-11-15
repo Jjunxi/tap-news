@@ -3,22 +3,46 @@ import './NewsPanel.css';
 
 import NewsCard from '../NewsCard/NewsCard';
 
+import _ from 'lodash';
+
 class NewsPanel extends React.Component {
     constructor() {
         super();
         this.state = {news:null};
+        this.handleScroll = this.handleScroll.bind(this);        
     }
 
     componentDidMount() {
         this.loadMoreNews();
+        // warp loadMoreNews, only once within 500ms 
+        this.loadMoreNews = _.debounce(this.loadMoreNews, 500);
+        window.addEventListener('scroll', this.handleScroll);        
+    }
+
+    handleScroll() {
+        // pixels scroll down
+        let scrollY = window.scrollY || window.pageYOffset
+            || document.documentElement.scrollTop;
+        if ((window.innerHeight + scrollY) >= (document.body.offsetHeight - 50)) {
+          console.log('Loading more news...');
+          this.loadMoreNews();
+        }
     }
 
     loadMoreNews() {
-        this.setState({
-            news: [
+        let request = new Request('http://localhost:3000/news', {
+            method: 'GET',
+            cache: false
+          });
 
-            ]
-        });
+        fetch(request)
+          .then((res) => res.json())
+          .then((loadedNews) => {
+            this.setState({
+              news: this.state.news ?
+                  this.state.news.concat(loadedNews) : loadedNews,
+            });
+          });
     }
 
     renderNews() {

@@ -53,7 +53,7 @@ class SignUpPage extends React.Component {
         this.setState({
           errors: {}
         });
-
+        console.log('200');
         // change the current URL to /login
         this.context.router.replace('/login');
       } else {
@@ -101,8 +101,8 @@ class SignUpPage extends React.Component {
 }
 
 // To make react-router work
-// SignUpPage.contextTypes = {
-//   router: PropTypes.object.isRequired
-// };
+SignUpPage.contextTypes = {
+  router: PropTypes.object.isRequired
+};
 
 export default SignUpPage;

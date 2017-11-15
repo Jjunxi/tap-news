@@ -1,0 +1,5 @@
+.idea/
+
+/backend_server/*.pyc
+
+/common/*.pyc

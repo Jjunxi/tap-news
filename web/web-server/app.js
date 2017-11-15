@@ -6,6 +6,11 @@ var news = require('./routes/news');
 
 var app = express();
 
+// connect mongodb
+// var config = require('./config/config.json');
+// require('./models/main.js').connect(config.mongoDbUri);
+require('./models/main.js')
+
 // view engine setup
 app.set('view engine', 'jade');
 app.set('views', path.join(__dirname, '../web-client/build/'));

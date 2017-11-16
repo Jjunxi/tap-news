@@ -24,7 +24,7 @@ class CloudAMQPClient:
             self.channel.basic_ack(method_frame.delivery_tag)
             return json.loads(body)
         else:
-            print('No message returned')
+            print('%s has no message returned' % (self.queue_name))
             return None
 
     # BlockingConnection.sleep is a safer way to sleep than time.sleep(). This

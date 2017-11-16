@@ -12,24 +12,31 @@ import mongodb_client
 from cloudAMQP_client import CloudAMQPClient
 
 DEDUPE_NEWS_TASK_QUEUE_URL = "amqp://aydehjks:UGzDXoy3_liMYmnzQZxXE-NsVNrV-LPR@elephant.rmq.cloudamqp.com/aydehjks"
-DEDUPE_NEWS_TASK_QUEUE_NAME = "dedupe-news"
+DEDUPE_NEWS_TASK_QUEUE_NAME = "dedupe Q"
 
-SLEEP_TIME_IN_SECONDS = 1
+SLEEP_TIME_IN_SECONDS = 3
 
 SAME_NEWS_SIMILARITY_THRESHOLD = 0.9
 
-NEWS_TABLE_NAME = "tap-news"
+NEWS_TABLE_NAME = "news"
 
 cloudAMQP_client = CloudAMQPClient(DEDUPE_NEWS_TASK_QUEUE_URL, DEDUPE_NEWS_TASK_QUEUE_NAME)
+
+total_news = 0
+
+def isBlank (myString):
+    return not (myString and myString.strip())
 
 def handle_message(msg):
     if msg is None or not isinstance(msg, dict) :
         return
     task = msg
     text = str(task['text'])
-    if text is None:
+    if isBlank(text):
+        print('blank news no need turnitin')
         return
 
+    print('turnitin a news...')
     # Get all recent news based on publishedAt
     published_at = parser.parse(task['publishedAt'])
     published_at_day_begin = datetime.datetime(published_at.year,
@@ -48,10 +55,9 @@ def handle_message(msg):
         documents.insert(0, text)
 
         # Calculate similarity matrix
-        tfidf = TfidfVectorizer().fit_transform(documents)
+        tfidf = TfidfVectorizer(stop_words=None).fit_transform(documents)
         pairwise_sim = tfidf * tfidf.T
-
-        print pairwise_sim
+        # print pairwise_sim
 
         rows, cols = pairwise_sim.shape
 
@@ -62,6 +68,10 @@ def handle_message(msg):
 
     task['publishedAt'] = parser.parse(task['publishedAt'])
     db[NEWS_TABLE_NAME].replace_one({'digest': task['digest']}, task, upsert=True)
+    global total_news
+    total_news += 1
+    print('Save a news to Mongo, total: %d' % total_news)
+
 
 while True:
     if cloudAMQP_client is not None:

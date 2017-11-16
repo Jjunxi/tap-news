@@ -11,6 +11,7 @@ CNN = 'cnn'
 DEFAULT_SOURCES = [CNN]
 
 SORT_BY_TOP = 'top'
+SORT_BY_POPULAR = 'popular'
 
 def buildUrl(end_point=NEWS_API_ENDPOINT, api_name=ARTICALS_API):
     return end_point + api_name

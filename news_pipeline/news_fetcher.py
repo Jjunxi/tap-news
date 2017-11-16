@@ -10,31 +10,40 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'scrapers'))
 import cnn_news_scraper
 from cloudAMQP_client import CloudAMQPClient
 
-SLEEP_TIME_IN_SECONDS = 5
+SLEEP_TIME_IN_SECONDS = 3
 
 # TODO: add your own queue url and name
 DEDUPE_NEWS_TASK_QUEUE_URL = "amqp://aydehjks:UGzDXoy3_liMYmnzQZxXE-NsVNrV-LPR@elephant.rmq.cloudamqp.com/aydehjks"
-DEDUPE_NEWS_TASK_QUEUE_NAME = "dedupe-news"
+DEDUPE_NEWS_TASK_QUEUE_NAME = "dedupe Q"
 SCRAPE_NEWS_TASK_QUEUE_URL = "amqp://aydehjks:UGzDXoy3_liMYmnzQZxXE-NsVNrV-LPR@elephant.rmq.cloudamqp.com/aydehjks"
-SCRAPE_NEWS_TASK_QUEUE_NAME = "scrape-news"
+SCRAPE_NEWS_TASK_QUEUE_NAME = "scrape Q"
 scrape_news_queue_client = CloudAMQPClient(SCRAPE_NEWS_TASK_QUEUE_URL, SCRAPE_NEWS_TASK_QUEUE_NAME)
 dedupe_news_queue_client = CloudAMQPClient(DEDUPE_NEWS_TASK_QUEUE_URL, DEDUPE_NEWS_TASK_QUEUE_NAME)
+
+
+
+def isBlank (myString):
+    return not (myString and myString.strip())
+
 
 def handle_message(msg):
     if msg is None or not isinstance(msg, dict):
         print('message is broken')
         return
 
+    print('parse a news...')
     task = msg
-    text = None
 
     # article = Article(task['url'])
     # article.download()
     # article.parse()
     # task['text'] = article.text
     text = cnn_news_scraper.extract_news(task['url'])
-    task['text'] = text
+    if isBlank(text):
+        print('news is blank')
+        return
 
+    task['text'] = text
     dedupe_news_queue_client.sendMessage(task)
 
 

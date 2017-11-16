@@ -1,7 +1,7 @@
 import os
 import sys
 
-from newspaper import Article
+# from newspaper import Article
 
 # import common package in parent directory
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'common'))
@@ -22,17 +22,18 @@ dedupe_news_queue_client = CloudAMQPClient(DEDUPE_NEWS_TASK_QUEUE_URL, DEDUPE_NE
 
 def handle_message(msg):
     if msg is None or not isinstance(msg, dict):
-        print 'message is broken'
+        print('message is broken')
         return
 
     task = msg
     text = None
 
-    article = Article(task['url'])
-    article.download()
-    article.parse()
-
-    task['text'] = article.text
+    # article = Article(task['url'])
+    # article.download()
+    # article.parse()
+    # task['text'] = article.text
+    text = cnn_news_scraper.extract_news(task['url'])
+    task['text'] = text
 
     dedupe_news_queue_client.sendMessage(task)
 

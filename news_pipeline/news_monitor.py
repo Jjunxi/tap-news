@@ -60,7 +60,7 @@ while True:
 
             cloudAMQP_client.sendMessage(news)
 
-    print "Fetched %d news." % num_of_new_news
+    print("Fetched %d news." % num_of_new_news)
 
     # AMQP connection keeps alive
     cloudAMQP_client.sleep(SLEEP_TIME_IN_SECONDS)

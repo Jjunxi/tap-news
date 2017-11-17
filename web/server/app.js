@@ -16,7 +16,7 @@ require('./models/main.js')
 app.set('view engine', 'jade');
 app.set('views', path.join(__dirname, '../web-client/build/'));
 
-app.use('/static', express.static(path.join(__dirname, '../web-client/build/static/')));
+app.use('/static', express.static(path.join(__dirname, '../client/build/static/')));
 app.use(bodyParser.json());
 
 // load passport strategies

@@ -21,7 +21,34 @@ NEWS_SOURCES = [
     'techcrunch',
     'the-new-york-times',
     'the-wall-street-journal',
-    'the-washington-post'
+    'the-washington-post',
+    'abc-news',
+    'abc-news-au',
+    'aftenposten',
+    'al-jazeera-english',
+    'ansa',
+    'argaam',
+    'ars-technica',
+    'ary-news',
+    'bild',
+    'axios',
+    'cbc-news',
+    'buzzfeed',
+    'cnbc',
+    'espn',
+    'focus',
+    'google-news',
+    'google-news-au',
+    'google-news-ar',
+    'google-news-br',
+    'google-news-ca',
+    'google-news-fr',
+    'google-news-in',
+    'google-news-is',
+    'google-news-it',
+    'google-news-ru',
+    'google-news-uk',
+    'google-news-sa',
 ]
 
 REDIS_HOST = "localhost"
@@ -39,32 +66,36 @@ SCRAPE_NEWS_TASK_QUEUE_NAME = "scrape Q"
 cloudAMQP_client = CloudAMQPClient(SCRAPE_NEWS_TASK_QUEUE_URL, SCRAPE_NEWS_TASK_QUEUE_NAME)
 
 while True:
-    news_list = news_api_client.getNewsFromSource()
-    print('Fetch %d news from source' % len(news_list))
-    num_of_new_news = 0
+    try:
+        news_list = news_api_client.getNewsFromSource(NEWS_SOURCES)
+        print('Fetch %d news from source' % len(news_list))
+        num_of_new_news = 0
 
-    for news in news_list:
-        news_digest = hashlib.md5(news['title'].encode('utf-8')).digest().encode('base64')
+        for news in news_list:
+            news_digest = hashlib.md5(news['title'].encode('utf-8')).digest().encode('base64')
 
-        if redis_client.get(news_digest) is None:
-            print('Fetch a fresh news')
-            num_of_new_news = num_of_new_news + 1
-            news['digest'] = news_digest
+            if redis_client.get(news_digest) is None:
+                print('Fetch a fresh news')
+                num_of_new_news = num_of_new_news + 1
+                news['digest'] = news_digest
 
-            # If 'publishedAt' is None, set it to current UTC time.
-            if news['publishedAt'] is None:
-                # Make the time in format YYYY-MM_DDTHH:MM:SS in UTC
-                news['publishedAt'] = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+                # If 'publishedAt' is None, set it to current UTC time.
+                if news['publishedAt'] is None:
+                    # Make the time in format YYYY-MM_DDTHH:MM:SS in UTC
+                    news['publishedAt'] = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
 
-            redis_client.set(news_digest, news)
-            # redis can clear document automatically
-            redis_client.expire(news_digest, NEWS_TIME_OUT_IN_SECONDS)
+                redis_client.set(news_digest, news)
+                # redis can clear document automatically
+                redis_client.expire(news_digest, NEWS_TIME_OUT_IN_SECONDS)
 
-            cloudAMQP_client.sendMessage(news)
-        else:
-            print('Fetch an old news')
+                cloudAMQP_client.sendMessage(news)
+            else:
+                print('Fetch an old news')
 
-    print("Send %d news to scrap Q" % num_of_new_news)
+        print("Send %d news to scrap Q" % num_of_new_news)
+    except Exception as e:
+        print(e)
+        continue
 
     # AMQP connection keeps alive
     cloudAMQP_client.sleep(SLEEP_TIME_IN_SECONDS)

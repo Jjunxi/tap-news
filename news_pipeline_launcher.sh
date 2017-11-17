@@ -1,8 +1,8 @@
 #!/bin/bash
-brew services start redis
-brew services start mongodb
+# brew services start redis
+# brew services start mongodb
 
-pip install -r requirements.txt
+sudo pip install -r requirements.txt
 
 cd ./news_pipeline
 python news_monitor.py &

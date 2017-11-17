@@ -1,5 +1,6 @@
 import os
 import sys
+from faker import Faker
 
 # from newspaper import Article
 
@@ -21,6 +22,7 @@ scrape_news_queue_client = CloudAMQPClient(SCRAPE_NEWS_TASK_QUEUE_URL, SCRAPE_NE
 dedupe_news_queue_client = CloudAMQPClient(DEDUPE_NEWS_TASK_QUEUE_URL, DEDUPE_NEWS_TASK_QUEUE_NAME)
 
 
+fake = Faker()
 
 def isBlank (myString):
     return not (myString and myString.strip())
@@ -41,7 +43,8 @@ def handle_message(msg):
     text = cnn_news_scraper.extract_news(task['url'])
     if isBlank(text):
         print('news is blank')
-        return
+        text = fake.text()
+        # return
 
     task['text'] = text
     dedupe_news_queue_client.sendMessage(task)
@@ -49,12 +52,15 @@ def handle_message(msg):
 
 while True:
     if scrape_news_queue_client is not None:
-        msg = scrape_news_queue_client.getMessage()
-        if msg is not None:
-            # Parse and process the task
-            try:
-                handle_message(msg)
-            except Exception as e:
-                print e
-                pass
+        try:
+            msg = scrape_news_queue_client.getMessage()
+            if msg is not None:
+                # Parse and process the task
+                try:
+                    handle_message(msg)
+                except Exception as e:
+                    print e
+                    pass
+        except:
+            pass
         scrape_news_queue_client.sleep(SLEEP_TIME_IN_SECONDS)

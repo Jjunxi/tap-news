@@ -2,13 +2,14 @@ import React from 'react';
 import './NewsPanel.css';
 import Auth from '../Auth/Auth';
 import NewsCard from '../NewsCard/NewsCard';
+import { Link } from 'react-router';
 
 import _ from 'lodash';
 
 class NewsPanel extends React.Component {
     constructor() {
         super();
-        this.state = {news:null};
+        this.state = {news:null, pageNum:1, loadedAll:false};
         this.handleScroll = this.handleScroll.bind(this);        
     }
 
@@ -30,7 +31,13 @@ class NewsPanel extends React.Component {
     }
 
     loadMoreNews() {
-        let request = new Request('http://localhost:3000/news', {
+        if (this.state.loadedAll === true) {
+            return;
+        }
+
+        let url = 'http://localhost:3000/news/userId/' + Auth.getEmail()
+            + '/pageNum/' + this.state.pageNum;
+        let request = new Request(encodeURI(url), {
             method: 'GET',
             headers: {
                 'Authorization': 'bearer ' + Auth.getToken(),
@@ -41,9 +48,14 @@ class NewsPanel extends React.Component {
         fetch(request)
           .then((res) => res.json())
           .then((loadedNews) => {
+              if (!loadedNews || loadedNews.length === 0) {
+                this.setState({ loadedAll: true });
+            }
             this.setState({
               news: this.state.news ?
                   this.state.news.concat(loadedNews) : loadedNews,
+              pageNum: this.state.pageNum + 1
+            
             });
           });
     }
@@ -51,9 +63,9 @@ class NewsPanel extends React.Component {
     renderNews() {
         const news_list = this.state.news.map(function(news) {
             return(
-                <a className="list-group-item" key={news.digest} href='#'>
+                <Link className="list-group-item" key={news.digest} to={news.url}>
                     <NewsCard news={news} />
-                </a>
+                </Link>
             );
         });
 

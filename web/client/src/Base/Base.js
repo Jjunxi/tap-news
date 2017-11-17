@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router';
 import PropTypes from 'prop-types';
 import Auth from '../Auth/Auth';
 import './Base.css';
@@ -17,8 +18,8 @@ const Base = ({ children }) => (
             </div>)
             :
             (<div>
-              <li><a href="/login">Log in</a></li>
-              <li><a href="/signup">Sign up</a></li>
+              <li><Link to="/login">Log in</Link></li>
+              <li><Link to="/signup">Sign up</Link></li>
             </div>)
           }
         </ul>

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-'''
+"""
 Time decay model:
 
 If selected:
@@ -14,7 +14,7 @@ The result of this is that the nth most recent selection will have a weight of
 (1-α)^n. Using a coefficient value of 0.05 as an example, the 10th most recent
 selection would only have half the weight of the most recent. Increasing epsilon
 would bias towards more recent results more.
-'''
+"""
 
 import news_classes
 import os
@@ -94,6 +94,7 @@ def handle_message(msg):
 
     db[PREFERENCE_MODEL_TABLE_NAME].replace_one({'userId': userId}, model, upsert=True)
 
+
 def run():
     while True:
         if cloudAMQP_client is not None:
@@ -107,6 +108,7 @@ def run():
                     pass
             # Remove this if this becomes a bottleneck.
             cloudAMQP_client.sleep(SLEEP_TIME_IN_SECONDS)
+
 
 if __name__ ==  "__main__":
     run()

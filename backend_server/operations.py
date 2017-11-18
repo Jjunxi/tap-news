@@ -73,8 +73,8 @@ def getNewsSummariesForUser(user_id, page_num):
         # Remove text field to save bandwidth.
         del news['text']
         # not sorted only mark as Recommend
-        if news['class'] == topPreference:
-            news['reason'] = 'Recommend'
+        # if news['class'] == topPreference:
+        #     news['reason'] = 'Recommend'
         if news['publishedAt'].date() == datetime.today().date():
             news['time'] = 'today'
     return json.loads(dumps(sliced_news))

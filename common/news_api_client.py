@@ -2,6 +2,7 @@ import requests
 import json
 # from json import loads
 from time import sleep
+from termcolor import colored
 
 NEWS_API_KEY = "dde11377207d41b8853f467b81059389"
 NEWS_API_ENDPOINT = "https://newsapi.org/v1/"
@@ -26,8 +27,9 @@ def getNewsFromSource(sources=[DEFAULT_SOURCES], sortBy=SORT_BY_TOP):
         response = requests.get(buildUrl(), params=payload)
         res_json = json.loads(response.content)
         count = len(res_json['articles']) if 'articles' in res_json else 0
-        print('Fetching %d news from %s' % (count, source))
-        
+        # print('Fetching %d news from %s' % (count, source))
+        print(colored('Fetching %d news from %s' % (count, source), 'red'))
+
         # Extract news from response
         if (res_json is not None and
             res_json['status'] == 'ok' and
